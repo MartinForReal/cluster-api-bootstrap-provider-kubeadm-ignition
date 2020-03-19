@@ -10,13 +10,12 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	ignTypes "github.com/coreos/ignition/config/v2_2/types"
 	"github.com/google/uuid"
-	"net/url"
 	"strings"
 	"time"
 )
 
 var (
-	baseIgnitionUri = map[string]string{
+	k8sIgnitionUri = map[string]string{
 		"v1.15.11": "ignition-config/k8s-v1.15.11.ign",
 		"v1.16.8":  "ignition-config/k8s-v1.16.8.ign",
 		"v1.17.4":  "ignition-config/k8s-v1.17.4.ign",
@@ -24,8 +23,9 @@ var (
 )
 
 const (
-	KubernetesDefaultVersion = "v1.17.4"
-	IngitionSchemaVersion    = "2.2.0"
+	KubernetesDefaultVersion      = "v1.17.4"
+	IngitionSchemaVersion         = "2.2.0"
+	ContainerLinuxBaseIgnitionUri = "ignition-config/containerlinux-base.ign"
 )
 
 func NewS3TemplateBackend(userdataDir string, userDataBucket string) (*S3TemplateBackend, error) {
@@ -48,22 +48,21 @@ type S3TemplateBackend struct {
 }
 
 func (factory *S3TemplateBackend) getIngitionConfigTemplate(node *Node) (*ignTypes.Config, error) {
-	templateConfigUri, ok := baseIgnitionUri[node.Version]
+	templateConfigUri, ok := k8sIgnitionUri[node.Version]
 	if !ok {
 		err := errors.New("kubernetes version is not supported.")
 		ignitionLogger.Error(err, "kubernetes version is not supported.")
-		templateConfigUri = baseIgnitionUri[KubernetesDefaultVersion]
+		templateConfigUri = k8sIgnitionUri[KubernetesDefaultVersion]
 	}
-	baseIgnitionUrl := &url.URL{
-		Scheme: "s3",
-		Host:   factory.userDataBucket,
-		Path:   templateConfigUri,
-	}
+
 	out := factory.getIngitionBaseConfig()
 	out.Ignition.Config = ignTypes.IgnitionConfig{
 		Append: []ignTypes.ConfigReference{
 			{
-				Source: baseIgnitionUrl.String(),
+				Source: GetS3Url(factory.userDataBucket, ContainerLinuxBaseIgnitionUri),
+			},
+			{
+				Source: GetS3Url(factory.userDataBucket, templateConfigUri),
 			},
 		},
 	}
@@ -90,16 +89,10 @@ func (factory *S3TemplateBackend) applyConfig(config *ignTypes.Config) (*ignType
 		ignitionLogger.Error(err, "failed to upload ignition file to bucket")
 		return nil, err
 	}
-
-	userDataUrl := url.URL{
-		Scheme: "s3",
-		Host:   factory.userDataBucket,
-		Path:   filePath,
-	}
 	out := factory.getIngitionBaseConfig()
 	out.Ignition.Config = ignTypes.IgnitionConfig{
 		Replace: &ignTypes.ConfigReference{
-			Source: userDataUrl.String(),
+			Source: GetS3Url(factory.userDataBucket, filePath),
 		},
 	}
 	return out, nil
