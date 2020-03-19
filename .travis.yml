@@ -11,7 +11,18 @@ env:
     - COMMIT=${TRAVIS_COMMIT::8}
     - REPO=mskj/kubeadm-bootstrap-controller-ignition
 
+before_script:
+	- "curl -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/fossas/fossa-cli/master/install.sh | sudo bash"
+
 script:
-  - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+  - fossa init
+  - fossa analyze
   - docker build -t ${REPO}:${COMMIT} -f Dockerfile .
-  - docker push ${REPO}:${COMMIT}
+
+after_success:
+    - fossa test
+deploy:
+  provider: script
+  script: bash docker_push.sh
+  on:
+    branch: master
