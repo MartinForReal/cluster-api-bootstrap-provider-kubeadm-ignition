@@ -1,4 +1,7 @@
 # Cluster API bootstrap provider kubeadm-ignition
+
+[![Build Status](https://travis-ci.org/minsheng-fintech-corp-ltd/cluster-api-bootstrap-provider-kubeadm-ignition.svg?branch=master)](https://travis-ci.org/minsheng-fintech-corp-ltd/cluster-api-bootstrap-provider-kubeadm-ignition)
+
 ## What is the Cluster API bootstrap provider kubeadm?
 
 Cluster API bootstrap provider Kubeadm (CABPK) is a component of
@@ -7,7 +10,7 @@ that is responsible of generating a cloud-init script to
 turn a Machine into a Kubernetes Node; this implementation uses [kubeadm](https://github.com/kubernetes/kubeadm) 
 for kubernetes bootstrap.
 
-### What is the Cluster API bootstrap provider kubeadm-ignition?
+## What is the Cluster API bootstrap provider kubeadm-ignition?
 
 a bootstraper provider which generates ignition config files for ignition based linux distributions. (Fedora Container linux )
 

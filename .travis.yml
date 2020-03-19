@@ -1,0 +1,17 @@
+language: go
+
+services:
+  - docker
+go:
+  - 1.14
+
+env:
+  global:
+    - GO111MODULE=on
+    - COMMIT=${TRAVIS_COMMIT::8}
+    - REPO=mskj/kubeadm-bootstrap-controller-ignition
+
+script:
+  - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+  - docker build -t ${REPO}:${COMMIT} -f Dockerfile .
+  - docker push ${REPO}:${COMMIT}
