@@ -1,6 +1,7 @@
 # Cluster API bootstrap provider kubeadm-ignition
 
 [![Build Status](https://travis-ci.org/minsheng-fintech-corp-ltd/cluster-api-bootstrap-provider-kubeadm-ignition.svg?branch=master)](https://travis-ci.org/minsheng-fintech-corp-ltd/cluster-api-bootstrap-provider-kubeadm-ignition)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fminsheng-fintech-corp-ltd%2Fcluster-api-bootstrap-provider-kubeadm-ignition.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fminsheng-fintech-corp-ltd%2Fcluster-api-bootstrap-provider-kubeadm-ignition?ref=badge_shield)
 
 ## What is the Cluster API bootstrap provider kubeadm?
 
@@ -185,3 +186,7 @@ The `KubeadmConfig` object supports customizing the content of the config-data:
 - `KubeadmConfig.Files` specifies additional files to be created on the machine
 - `KubeadmConfig.PreKubeadmCommands` specifies a list of commands to be executed before `kubeadm init/join`
 - `KubeadmConfig.PostKubeadmCommands` same as above, but after `kubeadm init/join`
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fminsheng-fintech-corp-ltd%2Fcluster-api-bootstrap-provider-kubeadm-ignition.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fminsheng-fintech-corp-ltd%2Fcluster-api-bootstrap-provider-kubeadm-ignition?ref=badge_large)

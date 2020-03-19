@@ -20,7 +20,7 @@ script:
   - docker build -t ${REPO}:${COMMIT} -f Dockerfile .
 
 after_success:
-    - fossa test
+  - fossa test
 deploy:
   provider: script
   script: bash docker_push.sh
