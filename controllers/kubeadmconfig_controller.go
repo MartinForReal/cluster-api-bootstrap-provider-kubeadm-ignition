@@ -384,6 +384,10 @@ func (r *KubeadmConfigReconciler) handleClusterNotInitialized(ctx context.Contex
 }
 
 func (r *KubeadmConfigReconciler) joinWorker(ctx context.Context, scope *Scope) (ctrl.Result, error) {
+	machine := &clusterv1.Machine{}
+	if err := runtime.DefaultUnstructuredConverter.FromUnstructured(scope.ConfigOwner.Object, machine); err != nil {
+		return ctrl.Result{}, errors.Wrapf(err, "cannot convert %s to Machine", scope.ConfigOwner.GetKind())
+	}
 	certificates := secret.NewCertificatesForWorker(scope.Config.Spec.JoinConfiguration.CACertPath)
 	err := certificates.Lookup(
 		ctx,
@@ -439,7 +443,7 @@ func (r *KubeadmConfigReconciler) joinWorker(ctx context.Context, scope *Scope) 
 				Dropins: types.GetCommandsDropins(scope.Config.Spec.PreKubeadmCommands, scope.Config.Spec.PostKubeadmCommands),
 			},
 		},
-		Version: scope.Config.Spec.ClusterConfiguration.KubernetesVersion,
+		Version: *machine.Spec.Version,
 	})
 	if err != nil {
 		scope.Error(err, "failed to create a worker join configuration")
@@ -454,13 +458,19 @@ func (r *KubeadmConfigReconciler) joinWorker(ctx context.Context, scope *Scope) 
 }
 
 func (r *KubeadmConfigReconciler) joinControlplane(ctx context.Context, scope *Scope) (ctrl.Result, error) {
+
 	if !scope.ConfigOwner.IsControlPlaneMachine() {
 		return ctrl.Result{}, fmt.Errorf("%s is not a valid control plane kind, only Machine is supported", scope.ConfigOwner.GetKind())
+	}
+	machine := &clusterv1.Machine{}
+	if err := runtime.DefaultUnstructuredConverter.FromUnstructured(scope.ConfigOwner.Object, machine); err != nil {
+		return ctrl.Result{}, errors.Wrapf(err, "cannot convert %s to Machine", scope.ConfigOwner.GetKind())
 	}
 
 	if scope.Config.Spec.JoinConfiguration.ControlPlane == nil {
 		scope.Config.Spec.JoinConfiguration.ControlPlane = &kubeadmv1beta1.JoinControlPlane{}
 	}
+
 
 	certificates := secret.NewCertificatesForJoiningControlPlane()
 	err := certificates.Lookup(
@@ -512,7 +522,7 @@ func (r *KubeadmConfigReconciler) joinControlplane(ctx context.Context, scope *S
 				Dropins: types.GetCommandsDropins(scope.Config.Spec.PreKubeadmCommands, scope.Config.Spec.PostKubeadmCommands),
 			},
 		},
-		Version: scope.Config.Spec.ClusterConfiguration.KubernetesVersion,
+		Version: *machine.Spec.Version,
 	})
 	if err != nil {
 		scope.Error(err, "failed to create a control plane join configuration")
