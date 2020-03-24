@@ -439,7 +439,7 @@ func (r *KubeadmConfigReconciler) joinWorker(ctx context.Context, scope *Scope) 
 			{
 				Name:    "kubeinit.service",
 				Enabled: true,
-				Content: fmt.Sprintf(types.JoinUnitTemplate, verbosityFlag, types.KubeadmConfigPath),
+				Content: fmt.Sprintf(types.JoinWorkerUnitTemplate, verbosityFlag, types.KubeadmConfigPath),
 				Dropins: types.GetCommandsDropins(scope.Config.Spec.PreKubeadmCommands, scope.Config.Spec.PostKubeadmCommands),
 			},
 		},
@@ -470,7 +470,6 @@ func (r *KubeadmConfigReconciler) joinControlplane(ctx context.Context, scope *S
 	if scope.Config.Spec.JoinConfiguration.ControlPlane == nil {
 		scope.Config.Spec.JoinConfiguration.ControlPlane = &kubeadmv1beta1.JoinControlPlane{}
 	}
-
 
 	certificates := secret.NewCertificatesForJoiningControlPlane()
 	err := certificates.Lookup(
@@ -518,7 +517,7 @@ func (r *KubeadmConfigReconciler) joinControlplane(ctx context.Context, scope *S
 			{
 				Name:    "kubeinit.service",
 				Enabled: true,
-				Content: fmt.Sprintf(types.JoinUnitTemplate, verbosityFlag, types.KubeadmConfigPath),
+				Content: fmt.Sprintf(types.JoinControlPlaneUnitTemplate, verbosityFlag, types.KubeadmConfigPath),
 				Dropins: types.GetCommandsDropins(scope.Config.Spec.PreKubeadmCommands, scope.Config.Spec.PostKubeadmCommands),
 			},
 		},

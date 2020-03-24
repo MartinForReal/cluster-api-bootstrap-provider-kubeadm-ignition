@@ -5,9 +5,10 @@ import (
 )
 
 const (
-	JoinUnitTemplate  = "[Unit]\nDescription=init k8s\nAfter=kubelet.service\nRequires=kubelet.service\nConditionPathExists=!/var/lib/kubelet\n[Service]\nType=oneshot\nUser=root\nEnvironment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/opt/bin:/opt/bin/\nExecStart=/opt/bin/kubeadm join %s --config %s \n[Install]\nWantedBy=multi-user.target\n"
-	InitUnitTemplate  = "[Unit]\nDescription=init k8s\nAfter=kubelet.service\nRequires=kubelet.service\nConditionPathExists=!/var/lib/kubelet\n[Service]\nType=oneshot\nUser=root\nEnvironment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/opt/bin:/opt/bin/\nExecStart=/opt/bin/kubeadm init %s --config %s \n[Install]\nWantedBy=multi-user.target\n"
-	KubeadmConfigPath = "/etc/kubernetes/kubeadm.yaml"
+	JoinControlPlaneUnitTemplate = "[Unit]\nDescription=init k8s\nAfter=docker.service\nRequires=extractk8s.service\nConditionPathExists=!/var/lib/kubelet\n[Service]\nType=oneshot\nUser=root\nEnvironment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/opt/bin:/opt/bin/\nExecStart=/opt/bin/kubeadm join %s --config %s \n[Install]\nWantedBy=multi-user.target\n"
+	JoinWorkerUnitTemplate       = "[Unit]\nDescription=init k8s\nAfter=docker.service\nRequires=extractk8s.service\nConditionPathExists=!/var/lib/kubelet\n[Service]\nType=oneshot\nUser=root\nEnvironment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/opt/bin:/opt/bin/\nExecStart=/opt/bin/kubeadm join %s --config %s \n[Install]\nWantedBy=multi-user.target\n"
+	InitUnitTemplate             = "[Unit]\nDescription=init k8s\nAfter=pullk8simages.service\nRequires=extractk8s.service\nConditionPathExists=!/var/lib/kubelet\n[Service]\nType=oneshot\nUser=root\nEnvironment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/opt/bin:/opt/bin/\nExecStart=/opt/bin/kubeadm init %s --config %s \n[Install]\nWantedBy=multi-user.target\n"
+	KubeadmConfigPath            = "/etc/kubernetes/kubeadm.yaml"
 )
 
 type Dropin struct {
