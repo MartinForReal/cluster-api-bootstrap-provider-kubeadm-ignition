@@ -430,11 +430,12 @@ func (r *KubeadmConfigReconciler) joinWorker(ctx context.Context, scope *Scope) 
 	}
 
 	cloudJoinData, err := r.IgnitionFactory.GenerateUserData(&ignition.Node{
-		Files: append(certificates.AsFiles(), bootstrapv1.File{
+		Files: []bootstrapv1.File{{
 			Path:        types.KubeadmConfigPath,
 			Permissions: "0640",
 			Content:     joinData,
-		}),
+		},
+		},
 		Services: []types.ServiceUnit{
 			{
 				Name:    "kubeinit.service",
