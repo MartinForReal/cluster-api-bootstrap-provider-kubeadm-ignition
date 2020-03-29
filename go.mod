@@ -4,7 +4,7 @@ go 1.14
 
 require (
 	github.com/ajeddeloh/go-json v0.0.0-20200220154158-5ae607161559 // indirect
-	github.com/aws/aws-sdk-go v1.29.30
+	github.com/aws/aws-sdk-go v1.29.34
 	github.com/coreos/ignition v0.35.0
 	github.com/go-logr/logr v0.1.0
 	github.com/google/uuid v1.1.1
@@ -20,5 +20,5 @@ require (
 	k8s.io/klog v1.0.0
 	k8s.io/utils v0.0.0-20200318093247-d1ab8797c558
 	sigs.k8s.io/cluster-api v0.3.2
-	sigs.k8s.io/controller-runtime v0.5.1
+	sigs.k8s.io/controller-runtime v0.5.2
 )
