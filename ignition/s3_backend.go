@@ -19,6 +19,7 @@ var (
 		"v1.15.11": "ignition-config/k8s-v1.15.11.ign",
 		"v1.16.8":  "ignition-config/k8s-v1.16.8.ign",
 		"v1.17.4":  "ignition-config/k8s-v1.17.4.ign",
+		"v1.18.0":  "ignition-config/k8s-v1.18.0.ign",
 	}
 )
 
