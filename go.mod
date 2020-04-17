@@ -15,7 +15,7 @@ require (
 	go4.org v0.0.0-20200312051459-7028f7b4a332 // indirect
 	k8s.io/api v0.17.2
 	k8s.io/apimachinery v0.17.2
-	k8s.io/client-go v0.17.2
+	k8s.io/client-go v0.18.2
 	k8s.io/cluster-bootstrap v0.17.2
 	k8s.io/klog v1.0.0
 	k8s.io/utils v0.0.0-20200318093247-d1ab8797c558
