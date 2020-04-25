@@ -18,12 +18,14 @@ package main
 
 import (
 	"flag"
+	"math/rand"
 	"github.com/minsheng-fintech-corp-ltd/cluster-api-bootstrap-provider-kubeadm-ignition/ignition"
 	"net/http"
 	_ "net/http/pprof"
 	"os"
 	"time"
 
+	"github.com/spf13/pflag"
 	kubeadmbootstrapcontrollers "github.com/minsheng-fintech-corp-ltd/cluster-api-bootstrap-provider-kubeadm-ignition/controllers"
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
@@ -33,6 +35,8 @@ import (
 	clusterv1alpha3 "sigs.k8s.io/cluster-api/api/v1alpha3"
 	kubeadmbootstrapv1alpha2 "sigs.k8s.io/cluster-api/bootstrap/kubeadm/api/v1alpha2"
 	kubeadmbootstrapv1alpha3 "sigs.k8s.io/cluster-api/bootstrap/kubeadm/api/v1alpha3"
+	expv1alpha3 "sigs.k8s.io/cluster-api/exp/api/v1alpha3"
+	"sigs.k8s.io/cluster-api/feature"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -50,6 +54,7 @@ func init() {
 
 	_ = clientgoscheme.AddToScheme(scheme)
 	_ = clusterv1alpha3.AddToScheme(scheme)
+	_ = expv1alpha3.AddToScheme(scheme)
 	_ = kubeadmbootstrapv1alpha2.AddToScheme(scheme)
 	_ = kubeadmbootstrapv1alpha3.AddToScheme(scheme)
 	// +kubebuilder:scaffold:scheme
@@ -58,6 +63,9 @@ func init() {
 var (
 	metricsAddr              string
 	enableLeaderElection     bool
+	leaderElectionLeaseDuration time.Duration
+	leaderElectionRenewDeadline time.Duration
+	leaderElectionRetryPeriod   time.Duration
 	watchNamespace           string
 	profilerAddress          string
 	kubeadmConfigConcurrency int
@@ -67,45 +75,59 @@ var (
 	userdataDir              string
 )
 
-func main() {
-	flag.StringVar(&metricsAddr, "metrics-addr", ":8080",
+func InitFlags(fs *pflag.FlagSet) {
+	fs.StringVar(&metricsAddr, "metrics-addr", ":8080",
 		"The address the metric endpoint binds to.")
 
-	flag.BoolVar(&enableLeaderElection, "enable-leader-election", false,
+	fs.BoolVar(&enableLeaderElection, "enable-leader-election", false,
 		"Enable leader election for controller manager. Enabling this will ensure there is only one active controller manager.")
+	fs.DurationVar(&leaderElectionLeaseDuration, "leader-election-lease-duration", 15*time.Second,
+		"Interval at which non-leader candidates will wait to force acquire leadership (duration string)")
 
-	flag.StringVar(&watchNamespace, "namespace", "",
+	fs.DurationVar(&leaderElectionRenewDeadline, "leader-election-renew-deadline", 10*time.Second,
+		"Duration that the acting master will retry refreshing leadership before giving up (duration string)")
+
+	fs.DurationVar(&leaderElectionRetryPeriod, "leader-election-retry-period", 2*time.Second,
+		"Duration the LeaderElector clients should wait between tries of actions (duration string)")
+
+	fs.StringVar(&watchNamespace, "namespace", "",
 		"Namespace that the controller watches to reconcile cluster-api objects. If unspecified, the controller watches for cluster-api objects across all namespaces.")
 
-	flag.StringVar(&profilerAddress, "profiler-address", "",
+	fs.StringVar(&profilerAddress, "profiler-address", "",
 		"Bind address to expose the pprof profiler (e.g. localhost:6060)")
 
-	flag.IntVar(&kubeadmConfigConcurrency, "kubeadmconfig-concurrency", 10,
+	fs.IntVar(&kubeadmConfigConcurrency, "kubeadmconfig-concurrency", 10,
 		"Number of kubeadm configs to process simultaneously")
 
-	flag.DurationVar(&syncPeriod, "sync-period", 10*time.Minute,
+	fs.DurationVar(&syncPeriod, "sync-period", 10*time.Minute,
 		"The minimum interval at which watched resources are reconciled (e.g. 15m)")
 
-	flag.DurationVar(&kubeadmbootstrapcontrollers.DefaultTokenTTL, "bootstrap-token-ttl", 15*time.Minute,
+	fs.DurationVar(&kubeadmbootstrapcontrollers.DefaultTokenTTL, "bootstrap-token-ttl", 15*time.Minute,
 		"The amount of time the bootstrap token will be valid")
 
-	flag.IntVar(&webhookPort, "webhook-port", 0,
+	fs.IntVar(&webhookPort, "webhook-port", 0,
 		"Webhook Server port, disabled by default. When enabled, the manager will only work as webhook server, no reconcilers are installed.")
-
-	flag.StringVar(
+	fs.StringVar(
 		&userDataBucket,
 		"ignition-userdata-bucket",
 		"container-service-demo",
 		"The bucket the userdata ignition file resides",
 	)
-	flag.StringVar(
+	fs.StringVar(
 		&userdataDir,
 		"ignition-userdata-dir",
 		"node-userdata",
 		"The bucket the userdata ignition file resides",
 	)
+	feature.MutableGates.AddFlag(fs)
+}
+func main() {
+	rand.Seed(time.Now().UnixNano())
 
-	flag.Parse()
+	InitFlags(pflag.CommandLine)
+	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)
+
+	pflag.Parse()
 
 	ctrl.SetLogger(klogr.New())
 
@@ -121,6 +143,9 @@ func main() {
 		MetricsBindAddress: metricsAddr,
 		LeaderElection:     enableLeaderElection,
 		LeaderElectionID:   "kubeadm-bootstrap-manager-leader-election-capi",
+		LeaseDuration:      &leaderElectionLeaseDuration,
+		RenewDeadline:      &leaderElectionRenewDeadline,
+		RetryPeriod:        &leaderElectionRetryPeriod,
 		Namespace:          watchNamespace,
 		SyncPeriod:         &syncPeriod,
 		NewClient:          newClientFunc,

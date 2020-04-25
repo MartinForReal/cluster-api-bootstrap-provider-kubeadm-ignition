@@ -11,14 +11,15 @@ require (
 	github.com/onsi/ginkgo v1.12.0
 	github.com/onsi/gomega v1.9.0
 	github.com/pkg/errors v0.9.1
+	github.com/spf13/pflag v1.0.5
 	github.com/vincent-petithory/dataurl v0.0.0-20191104211930-d1553a71de50
 	go4.org v0.0.0-20200312051459-7028f7b4a332 // indirect
-	k8s.io/api v0.17.2
-	k8s.io/apimachinery v0.17.2
-	k8s.io/client-go v0.17.2
+	k8s.io/api v0.18.2
+	k8s.io/apimachinery v0.18.2
+	k8s.io/client-go v0.18.2
 	k8s.io/cluster-bootstrap v0.17.2
 	k8s.io/klog v1.0.0
-	k8s.io/utils v0.0.0-20200318093247-d1ab8797c558
-	sigs.k8s.io/cluster-api v0.3.2
-	sigs.k8s.io/controller-runtime v0.5.2
+	k8s.io/utils v0.0.0-20200324210504-a9aa75ae1b89
+	sigs.k8s.io/cluster-api v0.3.3
+	sigs.k8s.io/controller-runtime v0.6.0
 )
