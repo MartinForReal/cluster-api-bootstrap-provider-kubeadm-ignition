@@ -9,7 +9,7 @@ env:
   global:
     - GO111MODULE=on
     - COMMIT=${TRAVIS_COMMIT::8}
-    - REPO=mskj/kubeadm-bootstrap-controller-ignition
+    - REPO=mskj/kubeadm-ignition-bootstrap-controller
 
 before_script:
   - "curl -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/fossas/fossa-cli/master/install.sh | sudo bash"
@@ -17,7 +17,8 @@ before_script:
 script:
   - fossa init
   - fossa analyze
-  - docker build -t ${REPO}:${COMMIT} -f Dockerfile .
+  - export TAG=`if [ -e "$TRAVIS_TAG" ]; then echo "$TRAVIS_TAG"; else echo $COMMIT ; fi`
+  - docker build -t ${REPO}:${TAG} -f Dockerfile .
 
 after_success:
   - fossa test

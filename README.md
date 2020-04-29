@@ -193,7 +193,14 @@ If a version template which contains url of binaries doesn't exist, the kubernet
 
 ### additional parameters
 
+manager-bootstrap-credentials: create a secret resource which stores aws ak/sk pairs
 
+args:
+--ignition-userdata-bucket bucket name
+--ignition-userdata-dir generated userdata location
+--ignition-template-dir template location
+
+Please refer to [deploy.yaml](./deploy.yaml)
 
 ### Additional Features
 The `KubeadmConfig` object supports customizing the content of the config-data:
