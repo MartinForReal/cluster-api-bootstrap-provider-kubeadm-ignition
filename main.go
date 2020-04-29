@@ -18,15 +18,15 @@ package main
 
 import (
 	"flag"
-	"math/rand"
 	"github.com/minsheng-fintech-corp-ltd/cluster-api-bootstrap-provider-kubeadm-ignition/ignition"
+	"math/rand"
 	"net/http"
 	_ "net/http/pprof"
 	"os"
 	"time"
 
-	"github.com/spf13/pflag"
 	kubeadmbootstrapcontrollers "github.com/minsheng-fintech-corp-ltd/cluster-api-bootstrap-provider-kubeadm-ignition/controllers"
+	"github.com/spf13/pflag"
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
@@ -61,18 +61,19 @@ func init() {
 }
 
 var (
-	metricsAddr              string
-	enableLeaderElection     bool
+	metricsAddr                 string
+	enableLeaderElection        bool
 	leaderElectionLeaseDuration time.Duration
 	leaderElectionRenewDeadline time.Duration
 	leaderElectionRetryPeriod   time.Duration
-	watchNamespace           string
-	profilerAddress          string
-	kubeadmConfigConcurrency int
-	syncPeriod               time.Duration
-	webhookPort              int
-	userDataBucket           string
-	userdataDir              string
+	watchNamespace              string
+	profilerAddress             string
+	kubeadmConfigConcurrency    int
+	syncPeriod                  time.Duration
+	webhookPort                 int
+	userDataBucket              string
+	userdataDir                 string
+	templateDir                 string
 )
 
 func InitFlags(fs *pflag.FlagSet) {
@@ -111,13 +112,19 @@ func InitFlags(fs *pflag.FlagSet) {
 		&userDataBucket,
 		"ignition-userdata-bucket",
 		"container-service-demo",
-		"The bucket the userdata ignition file resides",
+		"The bucket where the userdata ignition file resides",
 	)
 	fs.StringVar(
 		&userdataDir,
 		"ignition-userdata-dir",
 		"node-userdata",
-		"The bucket the userdata ignition file resides",
+		"The key path where the userdata ignition file resides",
+	)
+	fs.StringVar(
+		&templateDir,
+		"ignition-template-dir",
+		"ignition-config",
+		"the key path where the template resides",
 	)
 	feature.MutableGates.AddFlag(fs)
 }
@@ -155,7 +162,7 @@ func main() {
 		setupLog.Error(err, "unable to start manager")
 		os.Exit(1)
 	}
-	templateBackend, err := ignition.NewS3TemplateBackend(userdataDir, userDataBucket)
+	templateBackend, err := ignition.NewS3TemplateBackend(userdataDir, templateDir, userDataBucket)
 	if err != nil {
 		setupLog.Error(err, "unable to create aws s3 session")
 		os.Exit(1)

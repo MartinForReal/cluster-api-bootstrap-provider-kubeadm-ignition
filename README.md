@@ -180,6 +180,21 @@ should be provided as a `Secrets` objects in the management cluster.
 
 TODO: Add more info about certificate secrets
 
+### What is s3's role here?
+
+We upload generated user data to s3 bucket to ensure that secret stored in user data will not be exposed to user who has read access to ec2 instance
+And, it is also a part of work around which address ec2's user data size limit.
+
+In order to remove connection between specific disk image and k8s node version, we choose to download k8s binaries at boot time. And binary artifacts are stored in s3 too.
+
+binary artifacts are stored in s3 bucket. Please refer to [k8s artifact autosync](https://github.com/minsheng-fintech-corp-ltd/k8s-artifact-auto-sync)
+
+If a version template which contains url of binaries doesn't exist, the kubernetes version is not supported.
+
+### additional parameters
+
+
+
 ### Additional Features
 The `KubeadmConfig` object supports customizing the content of the config-data:
 
