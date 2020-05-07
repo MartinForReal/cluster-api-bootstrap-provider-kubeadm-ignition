@@ -9,7 +9,7 @@ require (
 	github.com/go-logr/logr v0.1.0
 	github.com/google/uuid v1.1.1
 	github.com/onsi/ginkgo v1.12.0
-	github.com/onsi/gomega v1.9.0
+	github.com/onsi/gomega v1.10.0
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/pflag v1.0.5
 	github.com/vincent-petithory/dataurl v0.0.0-20191104211930-d1553a71de50
