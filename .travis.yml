@@ -18,12 +18,19 @@ script:
   - fossa init
   - fossa analyze
   - export TAG=`if [ -e "$TRAVIS_TAG" ]; then echo "$TRAVIS_TAG"; else echo $COMMIT ; fi`
-  - docker build -t ${REPO}:${TAG} -f Dockerfile .
+  - make docker-build IMG=${REPO}:${TAG}
+  - make release IMG=${REPO}:${TAG}
 
 after_success:
   - fossa test
 deploy:
-  provider: script
-  script: bash docker_push.sh
-  on:
-    branch: master
+  - provider: script
+    script: bash docker_push.sh
+    on:
+      branch: master
+  - provider: releases
+    api_key: "${GITHUB_OAUTH_TOKEN}"
+    file: "config/bootstrap-components.yaml"
+    skip_cleanup: true
+    on:
+      tags: true
