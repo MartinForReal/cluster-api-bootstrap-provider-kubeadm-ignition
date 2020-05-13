@@ -1,0 +1,3 @@
+domain: mskj.com
+repo: github.com/minsheng-fintech-corp-ltd/cluster-api-bootstrap-provider-kubeadm-ignition
+version: "2"
