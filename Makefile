@@ -81,11 +81,11 @@ release: $(KUSTOMIZE) manifests
 	cd config/manager && $(KUSTOMIZE) edit set image controller=${IMG}
 	$(KUSTOMIZE) build config/default > config/bootstrap-components.yaml
 
-vendor: go.mod
+vendor/modules.txt: go.mod
 	go mod vendor
 
 # Generate manifests e.g. CRD, RBAC etc.
-manifests: controller-gen vendor
+manifests: controller-gen vendor/modules.txt
 	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./controllers/..." paths="./vendor/sigs.k8s.io/cluster-api/bootstrap/kubeadm/api/..." output:crd:artifacts:config=config/crd/bases output:rbac:dir=config/rbac output:webhook:dir=config/webhook
 
 # Run go fmt against code

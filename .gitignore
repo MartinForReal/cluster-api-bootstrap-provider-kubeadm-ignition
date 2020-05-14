@@ -6,3 +6,5 @@
 # User-specific stuff
 .idea/
 *.iml
+vendor
+hack/tools/bin/
