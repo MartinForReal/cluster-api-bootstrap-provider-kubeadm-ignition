@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # Build the manager binary
-FROM golang:1.14.2 as builder
+FROM golang:1.14.3 as builder
 WORKDIR /workspace
 
 # Run this with docker build --build_arg $(go env GOPROXY) to override the goproxy
@@ -41,5 +41,4 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=${ARCH} \
 FROM gcr.io/distroless/static:latest
 WORKDIR /
 COPY --from=builder /workspace/manager .
-USER nobody
 ENTRYPOINT ["/manager"]
