@@ -58,6 +58,7 @@ func init() {
 	_ = kubeadmbootstrapv1alpha2.AddToScheme(scheme)
 	_ = kubeadmbootstrapv1alpha3.AddToScheme(scheme)
 	// +kubebuilder:scaffold:scheme
+	os.Setenv("AWS_REGION","cn-northwest-1")
 }
 
 var (
