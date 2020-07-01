@@ -472,7 +472,12 @@ func (r *KubeadmConfigReconciler) joinControlplane(ctx context.Context, scope *S
 		scope.Config.Spec.JoinConfiguration.ControlPlane = &kubeadmv1beta1.JoinControlPlane{}
 	}
 
-	certificates := secret.NewCertificatesForJoiningControlPlane()
+	certificates := secret.Certificates{}
+	if scope.Config.Spec.ClusterConfiguration.Etcd.External != nil {
+		certificates = secret.NewCertificatesForInitialControlPlane(scope.Config.Spec.ClusterConfiguration)
+	}else{
+		certificates = secret.NewCertificatesForJoiningControlPlane()
+	}
 	err := certificates.Lookup(
 		ctx,
 		r.Client,
@@ -482,8 +487,16 @@ func (r *KubeadmConfigReconciler) joinControlplane(ctx context.Context, scope *S
 		scope.Error(err, "unable to lookup cluster certificates")
 		return ctrl.Result{}, err
 	}
-	if err := certificates.EnsureAllExist(); err != nil {
-		return ctrl.Result{}, err
+
+	if scope.Config.Spec.ClusterConfiguration.Etcd.External != nil{
+		testCertificates := certificates[:(len(certificates)-1)]
+		if err := testCertificates.EnsureAllExist(); err != nil {
+			return ctrl.Result{}, err
+		}
+	}else {
+		if err := certificates.EnsureAllExist(); err != nil {
+			return ctrl.Result{}, err
+		}
 	}
 
 	// ensure that joinConfiguration.Discovery is properly set for joining node on the current cluster
