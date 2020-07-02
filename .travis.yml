@@ -26,8 +26,6 @@ after_success:
 deploy:
   - provider: script
     script: bash docker_push.sh
-    on:
-      branch: master
   - provider: releases
     api_key: "${GITHUB_OAUTH_TOKEN}"
     file: "config/bootstrap-components.yaml"
