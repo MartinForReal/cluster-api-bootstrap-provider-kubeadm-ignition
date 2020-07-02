@@ -58,7 +58,6 @@ func init() {
 	_ = kubeadmbootstrapv1alpha2.AddToScheme(scheme)
 	_ = kubeadmbootstrapv1alpha3.AddToScheme(scheme)
 	// +kubebuilder:scaffold:scheme
-	os.Setenv("AWS_REGION","cn-northwest-1")
 }
 
 var (
@@ -78,7 +77,7 @@ var (
 )
 
 func InitFlags(fs *pflag.FlagSet) {
-	fs.StringVar(&metricsAddr, "metrics-addr", ":8081",
+	fs.StringVar(&metricsAddr, "metrics-addr", ":8080",
 		"The address the metric endpoint binds to.")
 
 	fs.BoolVar(&enableLeaderElection, "enable-leader-election", false,
