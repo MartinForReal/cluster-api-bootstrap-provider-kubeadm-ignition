@@ -490,10 +490,12 @@ func (r *KubeadmConfigReconciler) joinControlplane(ctx context.Context, scope *S
 		return ctrl.Result{}, err
 	}
 
-	if scope.Config.Spec.ClusterConfiguration.Etcd.External != nil{
-		testCertificates := certificates[:(len(certificates)-1)]
-		if err := testCertificates.EnsureAllExist(); err != nil {
-			return ctrl.Result{}, err
+	if scope.Config.Spec.ClusterConfiguration != nil{
+		if scope.Config.Spec.ClusterConfiguration.Etcd.External != nil {
+			testCertificates := certificates[:(len(certificates) - 1)]
+			if err := testCertificates.EnsureAllExist(); err != nil {
+				return ctrl.Result{}, err
+			}
 		}
 	}else {
 		if err := certificates.EnsureAllExist(); err != nil {
