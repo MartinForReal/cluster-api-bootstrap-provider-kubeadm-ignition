@@ -473,8 +473,10 @@ func (r *KubeadmConfigReconciler) joinControlplane(ctx context.Context, scope *S
 	}
 
 	certificates := secret.Certificates{}
-	if scope.Config.Spec.ClusterConfiguration.Etcd.External != nil {
-		certificates = secret.NewCertificatesForInitialControlPlane(scope.Config.Spec.ClusterConfiguration)
+	if scope.Config.Spec.ClusterConfiguration != nil {
+		if scope.Config.Spec.ClusterConfiguration.Etcd.External != nil {
+			certificates = secret.NewCertificatesForInitialControlPlane(scope.Config.Spec.ClusterConfiguration)
+		}
 	}else{
 		certificates = secret.NewCertificatesForJoiningControlPlane()
 	}
