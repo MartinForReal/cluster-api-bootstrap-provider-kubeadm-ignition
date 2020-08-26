@@ -58,6 +58,7 @@ func init() {
 	_ = kubeadmbootstrapv1alpha2.AddToScheme(scheme)
 	_ = kubeadmbootstrapv1alpha3.AddToScheme(scheme)
 	// +kubebuilder:scaffold:scheme
+	os.Setenv("AWS_REGION","cn-northwest-1")
 }
 
 var (
@@ -74,10 +75,14 @@ var (
 	userDataBucket              string
 	userdataDir                 string
 	templateDir                 string
+	userDataAddr                string
+	uploadPath                  string
+	downloadPath                string
+	boolS3                      bool
 )
 
 func InitFlags(fs *pflag.FlagSet) {
-	fs.StringVar(&metricsAddr, "metrics-addr", ":8080",
+	fs.StringVar(&metricsAddr, "metrics-addr", ":8081",
 		"The address the metric endpoint binds to.")
 
 	fs.BoolVar(&enableLeaderElection, "enable-leader-election", false,
@@ -115,16 +120,34 @@ func InitFlags(fs *pflag.FlagSet) {
 		"The bucket where the userdata ignition file resides",
 	)
 	fs.StringVar(
-		&userdataDir,
-		"ignition-userdata-dir",
-		"node-userdata",
-		"The key path where the userdata ignition file resides",
-	)
-	fs.StringVar(
 		&templateDir,
 		"ignition-template-dir",
-		"ignition-config",
+		"download/cluster-dev/ignition-config/",  // ignition-config
 		"the key path where the template resides",
+	)
+	fs.StringVar(
+		&userDataAddr,
+		"ignition-user-dir",
+		"http-file-server-ingress.mstech.com.cn",
+		"the key dir for userdata",
+		)
+	fs.BoolVar(
+		&boolS3,
+		"useS3",
+		false,
+		"use s3 to store useData",
+		)
+	fs.StringVar(
+		&uploadPath,
+		"ignition-upload-path",
+		"/usr/share/nginx/html/test/",  // ignition-config
+		"the key path where the template resides",
+	)
+	fs.StringVar(
+		&downloadPath,
+		"ignition-download-path",
+		"/download/test/",
+		"the key dir for userdata",
 	)
 	feature.MutableGates.AddFlag(fs)
 }
@@ -162,7 +185,14 @@ func main() {
 		setupLog.Error(err, "unable to start manager")
 		os.Exit(1)
 	}
-	templateBackend, err := ignition.NewS3TemplateBackend(userdataDir, templateDir, userDataBucket)
+
+	var templateBackend ignition.TemplateBackend
+	if boolS3{
+		templateBackend, err = ignition.NewS3TemplateBackend(userdataDir, templateDir, userDataBucket)
+	}else {
+		templateBackend, err = ignition.NewHttpTemplateBackend(templateDir,uploadPath,downloadPath,userDataAddr)
+	}
+
 	if err != nil {
 		setupLog.Error(err, "unable to create aws s3 session")
 		os.Exit(1)

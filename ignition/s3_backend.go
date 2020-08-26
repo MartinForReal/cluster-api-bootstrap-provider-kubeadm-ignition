@@ -7,8 +7,9 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
-	ignTypes "github.com/coreos/ignition/config/v2_2/types"
+	ignTypes "github.com/coreos/ignition/config/v3_0/types"
 	"github.com/google/uuid"
+	"os"
 	"strings"
 	"time"
 )
@@ -53,12 +54,12 @@ func (factory *S3TemplateBackend) getIngitionConfigTemplate(node *Node) (*ignTyp
 
 	out := factory.getIngitionBaseConfig()
 	out.Ignition.Config = ignTypes.IgnitionConfig{
-		Append: []ignTypes.ConfigReference{
+		Merge: []ignTypes.ConfigReference{
 			{
-				Source: GetS3Url(factory.userDataBucket, ContainerLinuxBaseIgnitionUri),
+				Source: StringToPtr(GetS3Url(factory.userDataBucket, ContainerLinuxBaseIgnitionUri)),
 			},
 			{
-				Source: GetS3Url(factory.userDataBucket, templateConfigUri),
+				Source: StringToPtr(GetS3Url(factory.userDataBucket, templateConfigUri)),
 			},
 		},
 	}
@@ -71,6 +72,23 @@ func (factory *S3TemplateBackend) applyConfig(config *ignTypes.Config) (*ignType
 		ignitionLogger.Error(err, "failed to marshal ignition file")
 		return nil, err
 	}
+
+	file, err := os.Create("index.html")
+	if err != nil {
+		ignitionLogger.Error(err,"can not create file")
+	}
+
+	defer file.Close()
+	downloader := s3manager.NewDownloader(factory.session)
+	_, err = downloader.Download(file,&s3.GetObjectInput{
+		Bucket: aws.String(factory.userDataBucket),
+		Key:    aws.String("index.html"),
+	})
+	if err != nil{
+		ignitionLogger.Error(err, "failed to get index.html")
+	}
+
+
 
 	uploader := s3manager.NewUploader(factory.session)
 	filePath := strings.Join([]string{factory.userdataDir, uuid.New().String()}, "/")
@@ -87,8 +105,8 @@ func (factory *S3TemplateBackend) applyConfig(config *ignTypes.Config) (*ignType
 	}
 	out := factory.getIngitionBaseConfig()
 	out.Ignition.Config = ignTypes.IgnitionConfig{
-		Replace: &ignTypes.ConfigReference{
-			Source: GetS3Url(factory.userDataBucket, filePath),
+		Replace: ignTypes.ConfigReference{
+			Source: StringToPtr(GetS3Url(factory.userDataBucket, filePath)),
 		},
 	}
 	return out, nil
