@@ -3,15 +3,16 @@ package ignition
 import (
 	"bytes"
 	"encoding/json"
+	"os"
+	"strings"
+	"time"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
-	ignTypes "github.com/coreos/ignition/config/v3_0/types"
+	ignTypes "github.com/coreos/ignition/v2/config/v3_0/types"
 	"github.com/google/uuid"
-	"os"
-	"strings"
-	"time"
 )
 
 const (
@@ -75,20 +76,18 @@ func (factory *S3TemplateBackend) applyConfig(config *ignTypes.Config) (*ignType
 
 	file, err := os.Create("index.html")
 	if err != nil {
-		ignitionLogger.Error(err,"can not create file")
+		ignitionLogger.Error(err, "can not create file")
 	}
 
 	defer file.Close()
 	downloader := s3manager.NewDownloader(factory.session)
-	_, err = downloader.Download(file,&s3.GetObjectInput{
+	_, err = downloader.Download(file, &s3.GetObjectInput{
 		Bucket: aws.String(factory.userDataBucket),
 		Key:    aws.String("index.html"),
 	})
-	if err != nil{
+	if err != nil {
 		ignitionLogger.Error(err, "failed to get index.html")
 	}
-
-
 
 	uploader := s3manager.NewUploader(factory.session)
 	filePath := strings.Join([]string{factory.userdataDir, uuid.New().String()}, "/")

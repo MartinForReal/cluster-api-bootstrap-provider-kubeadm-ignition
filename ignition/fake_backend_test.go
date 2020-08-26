@@ -1,7 +1,7 @@
 package ignition
 
 import (
-	ignTypes "github.com/coreos/ignition/config/v2_2/types"
+	ignTypes "github.com/coreos/ignition/v2/config/v3_0/types"
 )
 
 type FakeBackend struct {

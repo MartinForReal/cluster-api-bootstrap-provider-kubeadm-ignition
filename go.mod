@@ -6,7 +6,7 @@ require (
 	github.com/ajeddeloh/go-json v0.0.0-20200220154158-5ae607161559 // indirect
 	github.com/aws/aws-sdk-go v1.31.4
 	github.com/coreos/ignition v0.35.0
-	github.com/coreos/ignition/v2 v2.0.0 // indirect
+	github.com/coreos/ignition/v2 v2.0.0
 	github.com/go-logr/logr v0.1.0
 	github.com/google/uuid v1.1.1
 	github.com/onsi/ginkgo v1.12.2 // indirect
@@ -23,5 +23,3 @@ require (
 	sigs.k8s.io/cluster-api v0.3.5
 	sigs.k8s.io/controller-runtime v0.5.2
 )
-
-replace github.com/coreos/ignition v0.35.0 => github.com/coreos/ignition/v2 v2.0.0

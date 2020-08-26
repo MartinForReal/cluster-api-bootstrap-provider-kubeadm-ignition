@@ -2,31 +2,31 @@ package ignition
 
 import (
 	"encoding/json"
-	ignTypes "github.com/coreos/ignition/config/v3_0/types"
-	"github.com/google/uuid"
 	"io/ioutil"
 	"os"
+
+	ignTypes "github.com/coreos/ignition/v2/config/v3_0/types"
+	"github.com/google/uuid"
 )
 
 const (
-	IngitionFedoraSchemaVersion = "3.0.0"
+	IngitionFedoraSchemaVersion       = "3.0.0"
 	ContainerLinuxBaseIgnitionUriHttp = "containerlinux-base.ign"
 )
 
 type HttpTemplateBackend struct {
-	templateDir    string
-	userDataAddr   string
-	uploadPath     string
-	downloadPath   string
+	templateDir  string
+	userDataAddr string
+	uploadPath   string
+	downloadPath string
 }
 
-func NewHttpTemplateBackend( templateDir,uploadPath ,downloadPath,userDataAddr string) (*HttpTemplateBackend, error) {
+func NewHttpTemplateBackend(templateDir, uploadPath, downloadPath, userDataAddr string) (*HttpTemplateBackend, error) {
 	return &HttpTemplateBackend{
-		templateDir:    templateDir,
-		userDataAddr:   userDataAddr,
-		uploadPath:     uploadPath,
-		downloadPath:   downloadPath,
-
+		templateDir:  templateDir,
+		userDataAddr: userDataAddr,
+		uploadPath:   uploadPath,
+		downloadPath: downloadPath,
 	}, nil
 }
 
@@ -67,27 +67,27 @@ func (factory *HttpTemplateBackend) applyConfig(config *ignTypes.Config) (*ignTy
 		return nil, err
 	}
 
-	fileName := uuid.New().String()+".ign"
+	fileName := uuid.New().String() + ".ign"
 
 	err = ioutil.WriteFile(fileName, userdata, 0666)
 	if err != nil {
-		ignitionLogger.Error(err,"failed to save ignition file")
+		ignitionLogger.Error(err, "failed to save ignition file")
 	}
 
-	err = UploadFile(factory.userDataAddr,factory.uploadPath,fileName)
-	if err !=nil{
-		ignitionLogger.Error(err,"Upload file failed")
+	err = UploadFile(factory.userDataAddr, factory.uploadPath, fileName)
+	if err != nil {
+		ignitionLogger.Error(err, "Upload file failed")
 	}
 
-	if err := os.Remove(fileName); err != nil{
-		ignitionLogger.Error(err,"Delete file error")
+	if err := os.Remove(fileName); err != nil {
+		ignitionLogger.Error(err, "Delete file error")
 	}
 
 	out := factory.getIngitionBaseConfig()
 	out.Ignition.Config = ignTypes.IgnitionConfig{
 		Replace: ignTypes.ConfigReference{
-			Source: GetHttpUrl(factory.userDataAddr,factory.downloadPath+fileName),
+			Source: GetHttpUrl(factory.userDataAddr, factory.downloadPath+fileName),
 		},
 	}
-	return  out,  nil
+	return out, nil
 }

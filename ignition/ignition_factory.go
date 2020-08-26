@@ -2,15 +2,16 @@ package ignition
 
 import (
 	"encoding/json"
+	"net/url"
+	_ "reflect"
+	"strconv"
+
 	"github.com/coreos/ignition/config/util"
-	ignTypes "github.com/coreos/ignition/config/v3_0/types"
-	_"github.com/coreos/ignition/config/validate"
+	_ "github.com/coreos/ignition/config/validate"
+	ignTypes "github.com/coreos/ignition/v2/config/v3_0/types"
 	"github.com/minsheng-fintech-corp-ltd/cluster-api-bootstrap-provider-kubeadm-ignition/types"
 	"github.com/vincent-petithory/dataurl"
-	"net/url"
-	_"reflect"
 	"sigs.k8s.io/cluster-api/bootstrap/kubeadm/api/v1alpha3"
-	"strconv"
 )
 
 type TemplateBackend interface {
@@ -64,12 +65,12 @@ func getStorage(files []v1alpha3.File) (out ignTypes.Storage, err error) {
 				User: ignTypes.NodeUser{
 					Name: StringToPtr("root"),
 				},
-				Path:       file.Path,
-				Overwrite:  boolToPtr(true),
+				Path:      file.Path,
+				Overwrite: boolToPtr(true),
 			},
 			FileEmbedded1: ignTypes.FileEmbedded1{
 				//Append: false,
-				Mode:   intToPtr(DefaultFileMode),
+				Mode: intToPtr(DefaultFileMode),
 			},
 		}
 		if file.Permissions != "" {
