@@ -54,8 +54,8 @@ $(GO_APIDIFF): $(TOOLS_DIR)/go.mod
 all: manager
 
 # Run tests
-# test: generate fmt vet manifests
-#	/bin/bash -c "source ./hack/fetch_bins.sh; fetch_tools; setup_envs; go test ./... -coverprofile cover.out"
+test: generate fmt vet manifests
+	/bin/bash -c "source ./hack/fetch_bins.sh; fetch_tools; setup_envs; go test ./... -coverprofile cover.out"
 
 # Build manager binary
 manager: generate fmt vet
