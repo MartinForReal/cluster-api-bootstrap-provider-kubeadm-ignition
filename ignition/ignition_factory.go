@@ -6,8 +6,8 @@ import (
 	_ "reflect"
 	"strconv"
 
-	"github.com/coreos/ignition/config/util"
-	_ "github.com/coreos/ignition/config/validate"
+	"github.com/coreos/ignition/v2/config/util"
+	_ "github.com/coreos/ignition/v2/config/validate"
 	ignTypes "github.com/coreos/ignition/v2/config/v3_0/types"
 	"github.com/minsheng-fintech-corp-ltd/cluster-api-bootstrap-provider-kubeadm-ignition/types"
 	"github.com/vincent-petithory/dataurl"
