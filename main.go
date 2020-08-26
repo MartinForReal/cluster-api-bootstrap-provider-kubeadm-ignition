@@ -141,13 +141,13 @@ func InitFlags(fs *pflag.FlagSet) {
 		&uploadPath,
 		"ignition-upload-path",
 		"/usr/share/nginx/html/test/",  // ignition-config
-		"the key path where the template resides",
+		"the key path for upload file",
 	)
 	fs.StringVar(
 		&downloadPath,
 		"ignition-download-path",
 		"/download/test/",
-		"the key dir for userdata",
+		"the key path for download file",
 	)
 	feature.MutableGates.AddFlag(fs)
 }
