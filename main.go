@@ -128,7 +128,7 @@ func InitFlags(fs *pflag.FlagSet) {
 	fs.StringVar(
 		&userDataAddr,
 		"ignition-user-dir",
-		"http-file-server-ingress.mstech.com.cn",
+		"https://http-file-server-meta.mstech.com.cn",
 		"the key dir for userdata",
 		)
 	fs.BoolVar(

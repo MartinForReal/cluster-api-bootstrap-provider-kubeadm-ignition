@@ -72,7 +72,7 @@ func UploadFile(address,uploadPath,filename string) error {
 	}
 
 	client := &http.Client{}
-	req, err := http.NewRequest(method, "https://"+address+"/upload", playload)
+	req, err := http.NewRequest(method, address+"/upload", playload)
 	if err != nil {
 		fmt.Println(err)
 		return err
@@ -80,7 +80,7 @@ func UploadFile(address,uploadPath,filename string) error {
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 	res, err := client.Do(req)
 	if err != nil{
-		ignitionLogger.Error(err,"can not get sercer")
+		ignitionLogger.Error(err,"can not get server")
 	}
 	defer res.Body.Close()
 	body, err := ioutil.ReadAll(res.Body)
