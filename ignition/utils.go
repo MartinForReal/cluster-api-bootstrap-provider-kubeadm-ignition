@@ -80,7 +80,7 @@ func UploadFile(address,uploadPath,filename string) error {
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 	res, err := client.Do(req)
 	if err != nil{
-		ignitionLogger.Error(err,"can not get server")
+		ignitionLogger.Error(err,"can not get upload server")
 	}
 	defer res.Body.Close()
 	body, err := ioutil.ReadAll(res.Body)
