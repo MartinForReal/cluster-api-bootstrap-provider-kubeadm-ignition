@@ -7,7 +7,7 @@ require (
 	github.com/aws/aws-sdk-go v1.36.33
 	github.com/coreos/ignition v0.35.0
 	github.com/go-logr/logr v0.3.0
-	github.com/google/uuid v1.1.2
+	github.com/google/uuid v1.2.0
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/pflag v1.0.5
 	github.com/vincent-petithory/dataurl v0.0.0-20191104211930-d1553a71de50
